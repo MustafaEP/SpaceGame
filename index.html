@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Uzaydan Düsüş</title>
+        <style>
+            canvas {
+                border: 1px solid goldenrod;
+                background-color: darkseagreen;
+            }
+        </style>
+    </head>
+<body onload="oyunaBasla()">
+    <script>
+
+        var benimOyuncum;
+        var benimEngellerim = [];
+        var yildiz = [];
+        var Skor;
+        var arkaPlanim;
+        var yildizPuani = 0;
+        
+
+        function oyunaBasla() {
+            benimOyuncum = new bilesen(30, 30, "oyuncum.jpg", 120, 10, "image");
+            Skor = new bilesen("15px", "Consolas", "cyan", 200, 20, "text");
+            arkaPlanim = new bilesen(300, 480, "uzay.jpg", 0, 0, "image");
+            oyunAlanim.basla();
+        }
+
+        var oyunAlanim = {
+            canvas : document.createElement("canvas"),
+            basla : function() {
+                this.canvas.width = 300;
+                this.canvas.height = 480;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.frameNo = 0;
+                this.interval = setInterval(oyunAlaniniGuncelle, 20);
+                },
+            temizle : function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            durdur : function() {
+                clearInterval(this.interval);
+            }
+        }
+
+        function bilesen(width, height, color, x, y, type) {
+            this.type = type;
+            if (type == "image") {
+                this.image = new Image();
+                this.image.src = color;
+            }
+            this.width = width;
+            this.height = height;
+            this.speedX = 0;
+            this.speedY = 0;    
+            this.x = x;
+            this.y = y;    
+            this.guncelle = function() {
+                ctx = oyunAlanim.context;
+                if (this.type == "text") {
+                    ctx.font = this.width + " " + this.height;
+                    ctx.fillStyle = color;
+                    ctx.fillText(this.text, this.x, this.y);
+                }
+                else if (type == "image") {
+                    ctx.drawImage(this.image, 
+                        this.x, 
+                        this.y,
+                        this.width, this.height);
+                }  
+                
+                else {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+            this.yeniPozisyon = function() {
+                this.x += this.speedX;
+                this.y += this.speedY;        
+            }
+            this.carpisma = function(digerObje) {
+                var solum = this.x;
+                var sagim = this.x + (this.width);
+                var ustTaban = this.y;
+                var alttaban = this.y + (this.height);
+                var digerSol = digerObje.x;
+                var digerSag = digerObje.x + (digerObje.width);
+                var digerUstTaban = digerObje.y;
+                var digerAltTaban = digerObje.y + (digerObje.height);
+                var hata = true;
+                if ((alttaban < digerUstTaban) || (ustTaban > digerAltTaban) || (sagim < digerSol) || (solum > digerSag)) {
+                    hata = false;
+                }
+                return hata;
+            }
+        }
+
+        function oyunAlaniniGuncelle() {
+            var x, width, gap, minWidth, maxWidth, minGap, maxGap, skor;
+            
+            for (i = 0; i < benimEngellerim.length; i += 1) {
+                if (benimOyuncum.carpisma(benimEngellerim[i])) {
+                    oyunAlanim.durdur();
+                    return;
+                } 
+            }
+
+            for (i = 0; i < yildiz.length; i += 1) {
+                if (benimOyuncum.carpisma(yildiz[i])) {
+                    yildizPuani += 1;
+                    
+                } 
+            }
+
+           
+
+            oyunAlanim.temizle();
+            arkaPlanim.yeniPozisyon();
+            arkaPlanim.guncelle();
+            oyunAlanim.frameNo += 1;
+            if (oyunAlanim.frameNo == 1 || everyinterval(75)) {
+                x = oyunAlanim.canvas.width;
+                minWidth = 50;
+                maxWidth = 250;
+                width = Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+                minGap = 40;
+                maxGap = 80;
+                gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+
+                if(Boolean(Math.round(Math.random()))){
+                    benimEngellerim.push(new bilesen(30, 30, "kareEngeller.jfif", Math.random()*270, 440+x, "image"));
+                    
+                }
+                
+                
+                else{
+                
+                    
+                    
+                    benimEngellerim.push(new bilesen(50,50,"gezegen4.jfif", Math.random()*250, 440+x, "image"));
+                    yildiz.push(new bilesen(15,15,"Yizdiz.jpg", Math.random()*285, 440+x, "image"));
+
+
+                }
+
+                
+                    
+                
+
+
+            }
+            for (i = 0; i < benimEngellerim.length; i += 1) {
+
+                
+                    
+                    benimEngellerim[i].speedY = -3;
+
+                
+                
+                    benimEngellerim[i].speedY = -3;
+                
+                benimEngellerim[i].yeniPozisyon();
+                benimEngellerim[i].guncelle();
+            }
+
+            for(i = 0; i<yildiz.length; i+=1){
+                yildiz[i].speedY = -3;
+
+                yildiz[i].yeniPozisyon();
+                yildiz[i].guncelle();
+            }
+
+            Skor.text="SKOR: " + yildizPuani;
+            Skor.guncelle();
+            
+            benimOyuncum.yeniPozisyon();    
+            benimOyuncum.guncelle();
+        }
+
+        function everyinterval(n) {
+            if ((oyunAlanim.frameNo / n) % 1 == 0) {return true;}
+            return false;
+        }
+
+        function yurakiHareket() {
+            benimOyuncum.speedY = -3; 
+        }
+
+        function asagiHareket() {
+            benimOyuncum.speedY = 3; 
+        }
+
+        function solaHareket() {
+            benimOyuncum.speedX = -3; 
+        }
+
+        function sagaHareket() {
+            benimOyuncum.speedX = 3; 
+        }
+
+        function hareketiSifirla() {
+            benimOyuncum.speedX = 0; 
+            benimOyuncum.speedY = 0; 
+        }
+    </script>
+<div style="text-align:center;width:300px;">
+  <button onmousedown="yurakiHareket()" onmouseup="hareketiSifirla()" ontouchstart="yurakiHareket()">YUKARI</button><br><br><br>
+  <button onmousedown="solaHareket()" onmouseup="hareketiSifirla()" ontouchstart="solaHareket()">SOL</button>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button onmousedown="sagaHareket()" onmouseup="hareketiSifirla()" ontouchstart="sagaHareket()">SAĞ</button><br><br><br>
+  <button onmousedown="asagiHareket()" onmouseup="hareketiSifirla()" ontouchstart="asagiHareket()">AŞAĞI</button>
+</div>
+
+</body>
+</html>
