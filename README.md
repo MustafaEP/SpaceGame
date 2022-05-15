@@ -14,4 +14,4 @@ Opening the index.html file when all files are in the same folder
 * Different planets
 * Different spacecraft choices
 ### Developing the project
-* Mustafa Erhan PORTAKAL - first game -[Mustafa Erhan Portakal](https://github.com/MustafaEP)
+* Mustafa Erhan PORTAKAL - first game - [Mustafa Erhan Portakal](https://github.com/MustafaEP)
